@@ -1,4 +1,4 @@
-// Імпорт бібліотеки axios
+
 import axios from 'axios';
 
 // Створення класу NewsApiService для виконання запитів до API сайту Pixabay

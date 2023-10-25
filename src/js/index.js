@@ -1,4 +1,4 @@
-// Імпорт класу NewsApiService з файлу pix_app.js
+
 import NewsApiService from './pix_app.js';
 import notiflix from 'notiflix';
 import 'notiflix/dist/notiflix-3.2.6.min.css';
@@ -100,30 +100,36 @@ refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
 // Функція обробки події кліку на кнопку
 function onLoadMore() {
-  // Виконати запит до API за наступною сторінкою результатів
-  pixApiService.fetchImages().then(images => {
-    // Рендер розмітки карток зображень у галереї
-    renderGallery(images);
+    // Виконати запит до API за наступною сторінкою результатів
+    pixApiService.fetchImages().then(images => {
+      // Перевірка, чи є ще зображення для завантаження
+      if (images.length > 0) {
+        // Рендер розмітки карток зображень у галереї
+        renderGallery(images);
+  
+        // Прокрутити сторінку до нових елементів
+        scrollToNewElements();
+      } else {
+        // Сховати кнопку завантаження більше
+        refs.loadMoreBtn.classList.add('is-hidden');
 
-    // Прокрутити сторінку до нових елементів
-    scrollToNewElements();
-  });
-}
-// Функція прокрутки сторінки
+        notiflix.Notify.info(
+          "We're sorry, but you've reached the end of search results."
+        );
+      }
+    });
+  }
+
 function scrollToNewElements() {
-    // Отримати кількість елементів у галереї
+    
     const galleryItemsCount = refs.gallery.children.length;
   
-    // Перевірити, чи галерея не порожня і чи кількість елементів не менша за 41
     if (galleryItemsCount > 0 && galleryItemsCount >= 41) {
-      // Отримати посилання на останній елемент, який був до кліку на кнопку
       const lastItemBeforeClick = refs.gallery.children[galleryItemsCount - 41];
-  
-      // Прокрутити сторінку до цього елементу з плавним переходом
       lastItemBeforeClick.scrollIntoView({
         behavior: 'smooth',
         block: 'end',
       });
     }
   }
-  
+
