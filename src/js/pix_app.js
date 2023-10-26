@@ -14,36 +14,46 @@ export default class NewsApiService {
 
   // Метод для виконання запиту до API і повернення масиву зображень
   async fetchImages() {
-    // Створення рядка запиту з параметрами
-    const url = `https://pixabay.com/api/?key=${this.apiKey}&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=${this.perPage}`;
+    // Створення об'єкта параметрів запиту
+    const params = {
+      key: this.apiKey,
+      q: this.searchQuery,
+      image_type: 'photo',
+      orientation: 'horizontal',
+      safesearch: true,
+      page: this.page,
+      per_page: this.perPage,
+    };
 
-    // Виконання запиту за допомогою бібліотеки axios і синтаксису async/await
-    const response = await axios.get(url);
+    try {
+      // Отримання відповіді з API за допомогою методу get і передача параметрів
+      const response = await axios.get('https://pixabay.com/api/', { params });
 
-    // Отримання даних з відповіді
-    const data = response.data;
+      // Отримання даних з відповіді
+      const data = response.data;
 
-    // Збереження загальної кількості зображень, які відповідають критерію пошуку
-    this.totalHits = data.totalHits;
+      // Збереження загальної кількості зображень, які відповідають критерію пошуку
+      this.totalHits = data.totalHits;
 
-    // Збільшення номера сторінки на одиницю для наступного запиту
-    this.incrementPage();
+      // Збільшення номера сторінки на одиницю для наступного запиту
+      this.incrementPage();
 
-    // Повернення масиву зображень з даними
-    return data.hits;
+      // Повернення масиву зображень з даними
+      return data.hits;
+    } catch (error) {
+      // Виведення помилки у консоль
+      console.error(error);
+    }
   }
 
-  // Метод для збільшення номера сторінки на одиницю
   incrementPage() {
     this.page += 1;
   }
 
-  // Метод для скидання номера сторінки до початкового значення
   resetPage() {
     this.page = 1;
   }
 
-  // Геттер і сеттер для поля searchQuery
   get query() {
     return this.searchQuery;
   }
@@ -52,3 +62,5 @@ export default class NewsApiService {
     this.searchQuery = newQuery;
   }
 }
+
+  

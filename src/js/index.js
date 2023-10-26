@@ -1,72 +1,69 @@
-
 import NewsApiService from './pix_app.js';
 import notiflix from 'notiflix';
 import 'notiflix/dist/notiflix-3.2.6.min.css';
 
-// Створення екземпляру класу NewsApiService з унікальним ключем доступу до API
 const pixApiService = new NewsApiService('40208073-fe15c78bde1673dee4f2a3659');
 
-// Отримання посилань на елементи DOM
 const refs = {
   searchForm: document.querySelector('#search-form'),
   gallery: document.querySelector('#gallery'),
   loadMoreBtn: document.querySelector('#load-more'),
 };
 
-// Додавання слухача подій на форму пошуку
 refs.searchForm.addEventListener('submit', onSearch);
 
-// Функція обробки події сабміту форми
-function onSearch(e) {
-  // Запобігання перезавантаження сторінки
+// Функція для обробки події надсилання форми
+async function onSearch(e) { 
+  
   e.preventDefault();
-
-  // Очищення галереї від попередніх результатів
   clearGallery();
 
-  // Отримання значення поля вводу
   const query = e.currentTarget.elements.searchQuery.value;
 
   // Перевірка на пустий рядок
   if (query.trim() === '') {
-    // Показ повідомлення про помилку
+
     notiflix.Notify.failure('Please enter a valid search query.');
     return;
   }
 
-  // Встановлення значення поля вводу як ключового слова для пошуку
+  // Встановлення значення поля введення як ключового слова для пошуку
   pixApiService.query = query;
 
-  // Сховати кнопку завантаження більше
   refs.loadMoreBtn.classList.add('is-hidden');
 
-  // Виконати запит до API за першою сторінкою результатів
-  pixApiService.fetchImages().then(images => {
+  // Виконання запиту до API для першої сторінки результатів
+  try { 
+    const images = await pixApiService.fetchImages(); 
+
     // Перевірка на наявність результатів
     if (images.length === 0) {
-      // Показ повідомлення про відсутність результатів
+      // Показ сповіщення про відсутність результатів
       notiflix.Notify.info(
         'Sorry, there are no images matching your search query. Please try again.',
       );
       return;
     }
 
-    // Рендер розмітки карток зображень у галереї
     renderGallery(images);
 
-    // Показати кнопку завантаження більше
+    // Показати повідомлення про кількість знайдених зображень
+    notiflix.Notify.success(`Hooray! We found ${pixApiService.totalHits} images.`);
+
+    // Показати кнопку завантажити більше
     refs.loadMoreBtn.classList.remove('is-hidden');
-  });
+  } catch (error) { 
+    console.error(error);
+  }
 }
 
-// Функція очищення галереї
+// Функція для очищення галереї
 function clearGallery() {
   refs.gallery.innerHTML = '';
 }
 
-// Функція рендеру розмітки карток зображень
 function renderGallery(images) {
-  // Створення розмітки за шаблоном
+  // Створення розмітки за допомогою шаблону
   const markup = images
     .map(
       image => `
@@ -95,41 +92,42 @@ function renderGallery(images) {
   refs.gallery.insertAdjacentHTML('beforeend', markup);
 }
 
-// Додавання слухача подій на кнопку завантаження більше
+// Додавання обробника події до кнопки завантажити більше
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
-// Функція обробки події кліку на кнопку
-function onLoadMore() {
-    // Виконати запит до API за наступною сторінкою результатів
-    pixApiService.fetchImages().then(images => {
-      // Перевірка, чи є ще зображення для завантаження
-      if (images.length > 0) {
-        // Рендер розмітки карток зображень у галереї
-        renderGallery(images);
+// Функція для обробки події кліку на кнопку завантажити більше
+async function onLoadMore() { 
   
-        // Прокрутити сторінку до нових елементів
-        scrollToNewElements();
-      } else {
-        // Сховати кнопку завантаження більше
-        refs.loadMoreBtn.classList.add('is-hidden');
+  try { 
+    const images = await pixApiService.fetchImages(); 
 
-        notiflix.Notify.info(
-          "We're sorry, but you've reached the end of search results."
-        );
-      }
-    });
+    // Перевірка, чи є ще зображення для завантаження
+    if (images.length > 0) {
+      
+      renderGallery(images);
+
+      scrollToNewElements();
+    } else {
+      
+      refs.loadMoreBtn.classList.add('is-hidden');
+      notiflix.Notify.info(
+      'Were sorry, but youve reached the end of search results.'
+      );
+    }
+  } catch (error) { 
+    console.error(error);
   }
+}
 
 function scrollToNewElements() {
     
     const galleryItemsCount = refs.gallery.children.length;
   
-    if (galleryItemsCount > 0 && galleryItemsCount >= 41) {
-      const lastItemBeforeClick = refs.gallery.children[galleryItemsCount - 41];
+    if (galleryItemsCount > 0 && galleryItemsCount >= pixApiService.perPage) {
+      const lastItemBeforeClick = refs.gallery.children[galleryItemsCount - pixApiService.perPage];
       lastItemBeforeClick.scrollIntoView({
         behavior: 'smooth',
         block: 'end',
       });
     }
-  }
-
+}

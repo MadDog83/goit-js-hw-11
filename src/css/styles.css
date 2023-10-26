@@ -32,14 +32,23 @@ body {
     padding: 0;
   }
 
+
 /* Стилі для форми пошуку */
 .search-form {
+    width: 100%;
+    background: linear-gradient(315deg,rgba(164, 198, 92, 0.7) 3%,rgba(64, 92, 120, 0.7) 38%,rgba(48,238,226,.7) 68%,rgba(203, 149, 149, 0.7) 98%);
+    padding: 12px 0;
+    top: -15px;
+    left: 0;
+    box-shadow: 0 3px 5px rgba(0,0,0,.5);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 20px;
+    position: fixed;
+    justify-content: center;
   }
-  
+
   .search-form input {
     width: 300px;
     height: 40px;
@@ -61,6 +70,7 @@ body {
     cursor: pointer;
   }
   
+
   /* Стилі для галереї зображень */
   .gallery {
     display: grid;
@@ -72,6 +82,10 @@ body {
   /* Стилі для картки зображення */
   .photo-card {
     border-radius: 5px;
+    margin: 10px;
+    box-shadow: 0px 0px 5px 2px rgba(141, 222, 186, 0.5);
+    overflow: hidden;
+    background-color: rgba(57, 57, 12, 0.5);
   }
   
   .photo-card img {
@@ -97,6 +111,8 @@ body {
     margin: auto;
     margin-top: 20px;
     border-radius: 5px;
+    color: aqua;
+    background-color: coral;
   }
   
   /* Клас для приховування елемента */
