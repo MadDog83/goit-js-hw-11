@@ -38,7 +38,7 @@ async function onSearch(e) {
 
     // Перевірка на наявність результатів
     if (images.length === 0) {
-      // Показ сповіщення про відсутність результатів
+      
       notiflix.Notify.info(
         'Sorry, there are no images matching your search query. Please try again.',
       );
@@ -50,7 +50,6 @@ async function onSearch(e) {
     // Показати повідомлення про кількість знайдених зображень
     notiflix.Notify.success(`Hooray! We found ${pixApiService.totalHits} images.`);
 
-    // Показати кнопку завантажити більше
     refs.loadMoreBtn.classList.remove('is-hidden');
   } catch (error) { 
     console.error(error);
