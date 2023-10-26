@@ -38,7 +38,7 @@ export default class NewsApiService {
       // Збільшення номера сторінки на одиницю для наступного запиту
       this.incrementPage();
 
-      // Повернення масиву зображень з даними
+      // Повернення масиву зображень 
       return data.hits;
     } catch (error) {
       // Виведення помилки у консоль
