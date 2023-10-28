@@ -109,7 +109,7 @@ async function onLoadMore() {
     // Приховати кнопку "load more" і показати повідомлення, якщо досягнуто кінця результатів
     if (pixApiService.page == maxPages || images.length < 40) {
       refs.loadMoreBtn.classList.add('is-hidden');
-      notiflix.Notify.info(
+      notiflix.Notify.failure(
       'Were sorry, but youve reached the end of search results.'
       );
     }
