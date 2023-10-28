@@ -15,46 +15,50 @@ refs.searchForm.addEventListener('submit', onSearch);
 // Функція для обробки події надсилання форми
 async function onSearch(e) { 
   
-  e.preventDefault();
-  clearGallery();
-
-  const query = e.currentTarget.elements.searchQuery.value;
-
-  // Перевірка на пустий рядок
-  if (query.trim() === '') {
-
-    notiflix.Notify.failure('Please enter a valid search query.');
-    return;
-  }
-
-  // Встановлення значення поля введення як ключового слова для пошуку
-  pixApiService.query = query;
-
-  refs.loadMoreBtn.classList.add('is-hidden');
-
-  // Виконання запиту до API для першої сторінки результатів
-  try { 
-    const images = await pixApiService.fetchImages(); 
-
-    // Перевірка на наявність результатів
-    if (images.length === 0) {
-      
-      notiflix.Notify.info(
-        'Sorry, there are no images matching your search query. Please try again.',
-      );
+    e.preventDefault();
+    clearGallery();
+  
+    const query = e.currentTarget.elements.searchQuery.value;
+  
+    // Перевірка на пустий рядок
+    if (query.trim() === '') {
+  
+      notiflix.Notify.failure('Please enter a valid search query.');
       return;
     }
-
-    renderGallery(images);
-
-    // Показати повідомлення про кількість знайдених зображень
-    notiflix.Notify.success(`Hooray! We found ${pixApiService.totalHits} images.`);
-
-    refs.loadMoreBtn.classList.remove('is-hidden');
-  } catch (error) { 
-    console.error(error);
+ 
+    pixApiService.query = query;
+  
+    // Скидання номера сторінки до одиниці
+    pixApiService.resetPage();
+  
+    refs.loadMoreBtn.classList.add('is-hidden');
+  
+    // Виконання запиту до API для першої сторінки результатів
+    try { 
+      const images = await pixApiService.fetchImages(); 
+  
+      // Перевірка на наявність результатів
+      if (images.length === 0) {
+        
+        notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.',
+        );
+        return;
+      }
+  
+      renderGallery(images);
+      notiflix.Notify.success(`Hooray! We found ${pixApiService.totalHits} images.`);
+  
+      // Показати кнопку "load more", якщо зображень не менше 40
+      if (images.length >= 40) {
+        refs.loadMoreBtn.classList.remove('is-hidden');
+      }
+      
+    } catch (error) { 
+      console.error(error);
+    }
   }
-}
 
 // Функція для очищення галереї
 function clearGallery() {
@@ -62,7 +66,6 @@ function clearGallery() {
 }
 
 function renderGallery(images) {
-  // Створення розмітки за допомогою шаблону
   const markup = images
     .map(
       image => `
@@ -86,28 +89,25 @@ function renderGallery(images) {
   `,
     )
     .join('');
-
-  // Додавання розмітки до галереї
   refs.gallery.insertAdjacentHTML('beforeend', markup);
 }
 
-// Додавання обробника події до кнопки завантажити більше
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
-
-// Функція для обробки події кліку на кнопку завантажити більше
 async function onLoadMore() { 
   
   try { 
     const images = await pixApiService.fetchImages(); 
+    
+    // Виконання запиту до API для наступної сторінки результатів
+    renderGallery(images);
 
-    // Перевірка, чи є ще зображення для завантаження
-    if (images.length > 0) {
-      
-      renderGallery(images);
+    scrollToNewElements();
 
-      scrollToNewElements();
-    } else {
-      
+    // Обчислення максимальної кількості сторінок
+    const maxPages = Math.ceil(pixApiService.totalHits / pixApiService.perPage);
+    
+    // Приховати кнопку "load more" і показати повідомлення, якщо досягнуто кінця результатів
+    if (pixApiService.page == maxPages || images.length < 40) {
       refs.loadMoreBtn.classList.add('is-hidden');
       notiflix.Notify.info(
       'Were sorry, but youve reached the end of search results.'
@@ -130,3 +130,4 @@ function scrollToNewElements() {
       });
     }
 }
+
