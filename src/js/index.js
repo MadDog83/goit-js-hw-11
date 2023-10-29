@@ -120,14 +120,27 @@ async function onLoadMore() {
 
 function scrollToNewElements() {
     
-    const galleryItemsCount = refs.gallery.children.length;
-  
-    if (galleryItemsCount > 0 && galleryItemsCount >= pixApiService.perPage) {
-      const lastItemBeforeClick = refs.gallery.children[galleryItemsCount - pixApiService.perPage];
-      lastItemBeforeClick.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end',
-      });
-    }
+  const galleryItemsCount = refs.gallery.children.length;
+
+  if (galleryItemsCount > 0 && galleryItemsCount >= pixApiService.perPage) {
+    const lastItemBeforeClick = refs.gallery.children[galleryItemsCount - pixApiService.perPage];
+    lastItemBeforeClick.scrollIntoView({
+      behavior: 'smooth',
+      block: 'end',
+    });
+  }
 }
 
+/* function scrollToNewElements() {
+  const galleryItemsCount = refs.gallery.children.length;
+
+  if (galleryItemsCount > 0 && galleryItemsCount >= pixApiService.perPage) {
+    const lastItemBeforeClick = refs.gallery.children[galleryItemsCount - pixApiService.perPage];
+    const { height: cardHeight } = lastItemBeforeClick.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: "smooth",
+    });
+  }
+} */
